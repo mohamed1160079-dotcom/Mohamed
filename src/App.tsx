@@ -113,6 +113,11 @@ function AppContent() {
 
   // Update page title
   useEffect(() => {
+    const metaDescription = document.querySelector('meta[name="description"]') || document.createElement('meta');
+    metaDescription.setAttribute('name', 'description');
+    metaDescription.setAttribute('content', 'Mony Store متجر نسائي احترافي للملابس والشنط والاكسسوارات مع شحن سريع ودفع عند الاستلام.');
+    document.head.appendChild(metaDescription);
+
     const titles: Record<string, string> = {
       home: 'Mony Store | متجر موني',
       shop: 'Shop | تسوقي - Mony Store',

@@ -4,8 +4,7 @@ import { useLang } from '../context/LanguageContext';
 import { useCart } from '../context/CartContext';
 import { governorates, governoratesWithCities } from '../data/products';
 import { sendOrderToTelegram } from '../services/telegram';
-import { ArrowRight, ArrowLeft, CheckCircle, Package, MapPin, Phone, User, FileText, Banknote, ChevronDown, AlertCircle, ShieldCheck, Clock3, Truck } from 'lucide-react';
-import { openWhatsAppConfirmation } from '../utils/whatsapp';
+import { ArrowRight, ArrowLeft, CheckCircle, Package, MapPin, Phone, User, FileText, Banknote, ChevronDown, AlertCircle } from 'lucide-react';
 
 interface CheckoutProps {
   onBack: () => void;
@@ -59,6 +58,8 @@ export default function Checkout({ onBack, onOrderSuccess }: CheckoutProps) {
     const orderNumber = `MS-${Date.now().toString().slice(-4)}`;
     const shipping = 50;
 
+    const whatsappMessage = encodeURIComponent(`🛍️ طلب جديد من Mony Store\n\n👤 الاسم: ${form.name}\n📞 الهاتف: ${form.phone}\n📍 العنوان: ${form.governorate} - ${form.city} - ${form.address}\n\n🧾 المنتجات:\n${items.map(i => `• ${i.product.nameAr} × ${i.quantity}`).join('\n')}\n\n💰 الإجمالي: ${totalPrice + shipping} جنيه`);
+
     const success = await sendOrderToTelegram({
       orderNumber,
       name: form.name,
@@ -74,7 +75,7 @@ export default function Checkout({ onBack, onOrderSuccess }: CheckoutProps) {
     });
 
     if (success) {
-      openWhatsAppConfirmation({orderNumber,name:form.name,phone:form.phone,governorate:form.governorate,city:form.city,address:form.address,items,total:totalPrice+shipping});
+      window.open(`https://wa.me/201021569722?text=${whatsappMessage}`, '_blank');
       clearCart();
       setIsSubmitting(false);
       onOrderSuccess();
@@ -205,10 +206,13 @@ export default function Checkout({ onBack, onOrderSuccess }: CheckoutProps) {
                   <><CheckCircle size={16} />{t('checkout.placeOrder')}</>
                 )}
               </button>
-              <div className="grid grid-cols-3 gap-2 mt-4">
-                <div className="bg-pink-50 rounded-xl p-2 text-center"><ShieldCheck size={16} className="mx-auto text-pink-500 mb-1"/><p className="text-[10px] text-gray-600">دفع عند الاستلام</p></div>
-                <div className="bg-pink-50 rounded-xl p-2 text-center"><Truck size={16} className="mx-auto text-pink-500 mb-1"/><p className="text-[10px] text-gray-600">شحن سريع</p></div>
-                <div className="bg-pink-50 rounded-xl p-2 text-center"><Clock3 size={16} className="mx-auto text-pink-500 mb-1"/><p className="text-[10px] text-gray-600">تأكيد فوري</p></div>
+              <div className="mt-4 p-3 rounded-2xl bg-emerald-50 border border-emerald-100">
+                <div className="flex items-center gap-2 text-xs text-emerald-700 font-semibold mb-2">✅ ضمان استبدال خلال 14 يوم • شحن سريع لكل المحافظات</div>
+                <div className="text-[11px] text-gray-500 leading-5">بعد تأكيد الطلب سيتم التواصل معك عبر واتساب لتأكيد الشحنة وموعد التوصيل.</div>
+              </div>
+
+              <div className="mt-4 flex items-center justify-center gap-4 text-[10px] text-gray-400">
+                <span>🔒 {isRTL ? 'آمن 100%' : '100% Secure'}</span><span>🇪🇬 {isRTL ? 'مصر' : 'Egypt'}</span>
               </div>
             </motion.div>
           </div>
